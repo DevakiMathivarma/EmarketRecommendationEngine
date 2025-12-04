@@ -1,0 +1,32 @@
+name: e-market
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install EB CLI
+        run: pip install awsebcli
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:  AKIAR65XBVPARNFMK4F2Y
+          aws-secret-access-key:  fqmA+qzJcNcFz5RtjXWMMq8GQz4M5QjtNAfEwgz2
+          aws-region: ap-south-1
+
+      - name: Deploy to EB
+        run: eb deploy --staged

@@ -1,0 +1,252 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}{{ product.name }} | Mega Jewellery{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/product_description.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css"/>
+{% endblock %}
+
+{% block content %}
+<div class="product-detail-container">
+
+  <!-- LEFT SIDE - Thumbnails -->
+  <div class="thumbnails">
+    <img src="{{ product.thumbnail1.url|default:product.thumbnail1 }}" class="thumb" alt="{{ product.name }}">
+    <img src="{{ product.thumbnail2.url|default:product.thumbnail2 }}" class="thumb" alt="{{ product.name }}">
+    <img src="{{ product.thumbnail3.url|default:product.thumbnail3 }}" class="thumb" alt="{{ product.name }}">
+  </div>
+
+  <!-- CENTER - Main Image -->
+  <div class="main-image">
+    <img id="mainImage" src="{{ product.get_image_url }}" alt="{{ product.name }}">
+  </div>
+
+  <!-- RIGHT SIDE - Info -->
+  <div class="product-info">
+    <h2 class="product-title">{{ product.name }}</h2>
+    <p class="product-subtitle">{{ product.name_description }}</p>
+
+    <!-- Size, Metal, Customize -->
+    <div class="options">
+      <div class="option"><strong>Size</strong>:<br> {{ product.size }}</div>
+      <div class="option"><strong>Material</strong>:<br> {{ product.metal }}</div>
+      <div class="option"><button class="btn-customize">Customize</button></div>
+    </div>
+
+    <!-- Color Options -->
+    <div class="colors">
+      <span>Color:Rose Gold</span><br>
+      <button class="color-swatch" style="background:#FFD700"></button>
+      <button class="color-swatch" style="background:#FF1493"></button>
+      <button class="color-swatch" style="background:#008000"></button>
+      <button class="color-swatch" style="background:#000"></button>
+      <button class="color-swatch" style="background:#800080"></button>
+    </div>
+
+    <!-- Quantity & Book Now -->
+<form method="post" action="{% url 'book_now' product.id %}">
+  {% csrf_token %}
+  <div class="purchase">
+    <div class="quantity">
+      <button type="button" id="decrease">-</button>
+      <input id="quantity" type="text" name="qty" value="{{ quantity_in_cart }}" readonly>
+      <button type="button" id="increase">+</button>
+    </div>
+    <button type="submit" class="btn-book">BOOK NOW</button>
+  </div>
+</form>
+
+
+    <!-- Delivery, Payment, Warranty, Care -->
+    <div class="details-tabs">
+      <div class="tab">Delivery</div>
+      <div class="tab">Payment</div>
+      <div class="tab">Warranty</div>
+      <div class="tab">Care</div>
+    </div>
+  </div>
+</div>
+
+<!-- DESCRIPTION -->
+<div class="description" >
+  <h3>DESCRIPTION</h3>
+  <p>{{ product.description }}</p>
+</div>
+
+<!-- RELATED IMAGES + VIDEO -->
+<div class="related-section" >
+  <img src="{{ product.thumbnail1.url|default:product.thumbnail1 }}" class="related-img" alt="">
+  <video controls class="related-video">
+    <source src="{{ product.video.url|default:product.video }}" type="video/mp4">
+  </video>
+  <img src="{{ product.thumbnail2.url|default:product.thumbnail2 }}" class="related-img" alt="">
+</div>
+
+<h2 style="margin-top:40px;text-align: center;">You May Also Like</h2>
+<div class="product-grid">
+  {% for p in recommended %}
+    <div class="product-card">
+      <a href="{% url 'product_detail' p.id %}">
+        <img src="{{ p.get_image_url }}" />
+        <h4>{{ p.name }}</h4>
+        <span>₹{{ p.price_per_day }}</span> <a href="{% url 'add_to_cart' p.id %}" class="btn-rent" >
+        Add to Cart
+      </a>
+      </a>
+
+    </div>
+  {% endfor %}
+</div>
+
+<h2 style="margin-top:40px; text-align: center;">Customers also bought</h2>
+
+{# If there are no items to render at all, show a simple message #}
+{% if not also_bought %}
+  <p style="color:#666; text-align: center; margin-top:10px;">
+    Purchase insights for this product are not available at the moment.
+  </p>
+
+{# Otherwise we have items (either real also-bought or fallback popular). 
+   Show a contextual subtitle when the product has NO raw customer also_bought_ids. #}
+{% else %}
+  {% if not product.recommendation or not product.recommendation.also_bought_ids %}
+    <p class="subtitle" style="margin-top:10px; text-align: center;">
+      No customer insights — showing popular items in this category.
+    </p>
+  {% endif %}
+
+  <div class="product-grid" style="margin-top:18px;">
+    {% for p in also_bought %}
+      <div class="product-card">
+        <a href="{% url 'product_detail' p.id %}">
+          <img src="{{ p.get_image_url }}" alt="{{ p.name }}">
+          <h4>{{ p.name }}</h4>
+          <span>₹{{ p.price_per_day }}</span><a href="{% url 'add_to_cart' p.id %}" class="add-cart-btn btn-rent" >
+        Add to Cart
+      </a>
+        </a>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<!-- Toast container -->
+<div class="toast-wrap" id="toastWrap" aria-live="polite" aria-atomic="true" style="display:none;">
+  <div class="toast" id="toast">
+    <div class="ico" id="toastIco">✓</div>
+    <div class="text" id="toastText">Added to cart</div>
+    <button class="close" id="toastClose" aria-label="Close">&times;</button>
+  </div>
+</div>
+
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({ duration: 1000, once: true });
+
+  // Thumbnail click to change main image
+  document.querySelectorAll('.thumb').forEach(img=>{
+    img.addEventListener('click', ()=>{
+      document.getElementById('mainImage').src = img.src;
+    });
+  });
+
+  // Quantity control
+  const qtyInput = document.getElementById("quantity");
+  document.getElementById("decrease").addEventListener("click", () => {
+    if (parseInt(qtyInput.value) > 1) {
+      qtyInput.value = parseInt(qtyInput.value) - 1;
+    }
+  });
+  document.getElementById("increase").addEventListener("click", () => {
+    qtyInput.value = parseInt(qtyInput.value) + 1;
+  });
+
+  
+document.addEventListener("DOMContentLoaded", function () {
+  const toastWrap = document.getElementById("toastWrap");
+  const toast = document.getElementById("toast");
+  const toastText = document.getElementById("toastText");
+  const toastClose = document.getElementById("toastClose");
+  const toastIco = document.getElementById("toastIco");
+  let hideTimer = null;
+
+  function showToast(message, type="success", autoClose=true, redirectUrl=null, delayMs=700) {
+    // set content
+    toastText.textContent = message;
+    toastIco.textContent = type === "success" ? "✓" : "⚠";
+    // show
+    toastWrap.style.display = "block";
+    toast.classList.remove("hide");
+    toast.classList.add("show");
+    // clear old timer
+    if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+    // schedule hide
+    if (autoClose) {
+      hideTimer = setTimeout(()=> {
+        closeToast();
+        if (redirectUrl) window.location.href = redirectUrl;
+      }, delayMs + 600); // leave time for visible animation
+      // also redirect slightly earlier to feel instant
+      if (redirectUrl) {
+        setTimeout(()=> window.location.href = redirectUrl, delayMs);
+      }
+    }
+  }
+
+  function closeToast() {
+    toast.classList.remove("show");
+    toast.classList.add("hide");
+    // after animation, hide container
+    setTimeout(()=> { toastWrap.style.display = "none"; }, 300);
+    if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+  }
+
+  toastClose.addEventListener("click", function (e) {
+    e.preventDefault();
+    closeToast();
+  });
+
+// Intercept all rent links (.btn-rent). Works without changing existing HTML.
+  document.querySelectorAll(".btn-rent").forEach(function (link) {
+    // remove any inline onclick to avoid duplicate alerts
+    if (link.hasAttribute("onclick")) link.removeAttribute("onclick");
+
+    link.addEventListener("click", function (ev) {
+      ev.preventDefault();
+      ev.stopPropagation();
+
+      const href = link.href;
+      // product name fallback from nearest h3 or h4 inside card
+      const card = link.closest(".product-card");
+      let pname = "";
+      if (card) {
+        const title = card.querySelector("h3, h4");
+        if (title) pname = title.textContent.trim();
+      }
+      // Detect if link goes to login (simple heuristic: contains '/login' or named URL)
+      const isLogin = href && href.match(/\/login/);
+
+      if (isLogin) {
+        showToast("Please login to rent this product", "warning", true, href, 900);
+        return;
+      }
+
+      // Show rented toast, then follow link
+      const msg = pname ? `✅ ${pname} added successfully!` : "✅ Product added successfully!";
+      showToast(msg, "success", true, href, 700);
+    });
+  });
+  });
+
+  
+</script>
+
+{% endblock %}
