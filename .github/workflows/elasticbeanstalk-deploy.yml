@@ -29,4 +29,4 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Deploy to EB
-        run: eb deploy --staged
+        run: eb deploy my-django-env --staged
