@@ -326,6 +326,44 @@ max-width: 1200px;
   border-radius: 10px;
 }
 
+
+/* .arrival_new{
+  background:black;
+  width:90%;
+  margin:auto;
+  padding:30px;
+} */
+/* ---- */
+ .arrival_new {
+  position: relative;
+  background: #949393;       /* black base */
+  width: 90%;
+  margin: auto;
+  padding: 30px;
+  overflow: hidden;       /* keep overlay inside */
+}
+
+.arrival_new::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.08),
+      rgba(255, 255, 255, 0.03)
+  );
+  opacity: 0.35;          /* adjust softness */
+  pointer-events: none;   /* don’t block clicks */
+  z-index: 0;
+}
+
+/* make the content stay above */
+.arrival_new * {
+  position: relative;
+  z-index: 2;
+}
+/* ---- */
+
 /* track: two sets of slides side-by-side for seamless loop */
 .promo-carousel-track {
   display: flex;
