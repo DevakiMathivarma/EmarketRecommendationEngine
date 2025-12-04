@@ -13,6 +13,27 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     {% block extra_css %}{% endblock %}
     <style>
+body {
+  background:
+    
+    repeating-linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.4) 0px,
+      rgba(255, 255, 255, 0.4) 2px,
+      transparent 2px,
+      transparent 12px
+    ),
+    radial-gradient(900px 600px at 5% 10%, rgba(255, 220, 185, 0.35), transparent 60%),
+    radial-gradient(800px 700px at 95% 90%, rgba(255, 235, 210, 0.30), transparent 70%),
+    linear-gradient(180deg, #fff8f3 0%, #fff4ee 50%, #fff1e8 100%);
+
+  filter: blur(0.5px);
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+    
+
         /* ===== Navbar (no CSS variables) ===== */
         .mega-nav {
             background: #ffffff;
@@ -62,33 +83,6 @@
         /* Center links (desktop) */
         .main-nav {
             height: 100%;
-        }
-
-        .main-nav .nav-link {
-            font-family: "Georgia", "Times New Roman", serif;
-            font-size: 18px;
-            color: #0e0e0e;
-            padding: 0 16px !important;
-            line-height: 56px;
-            /* match bar height */
-            position: relative;
-            transition: color .2s ease;
-        }
-
-        .main-nav .nav-link:hover {
-            color: #222222;
-        }
-
-        .main-nav .nav-link.active::after {
-            content: "";
-            position: absolute;
-            left: 50%;
-            bottom: 12px;
-            transform: translateX(-50%);
-            width: 16px;
-            height: 2px;
-            background: #000000;
-            border-radius: 2px;
         }
 
         /* Right icons */
@@ -245,6 +239,117 @@
   font-size: 16px;
   color: #000;
 }
+.badge {
+  background: red !important;
+  color: white !important;
+}
+
+
+/* Ensure no accidental gaps */
+html, body { margin: 0; padding: 0; }
+
+/* Fix navbar to top (override bootstrap sticky-top) */
+nav.mega-nav {
+  position: fixed !important;
+  top: 0; left: 0; right: 0;
+  z-index: 99999;
+  background: white;
+  background-size: 400% 400%;
+  animation: infinityMove 10s ease infinite;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Give a visible area under nav so it doesn't cover the page */
+body { padding-top: 80px; } /* fallback; script will set precise value */
+
+/* Slight shrink when scrolled */
+nav.mega-nav.scrolled {
+  height: 66px !important;
+  box-shadow: 0 20px 50px rgba(12,18,28,0.10);
+  transform: translateY(0);
+}
+
+/* Brand logo pop on hover (works with bootstrap) */
+.brand-wrap .brand-logo {
+  width: 34px; height: 34px;
+  transition: transform 420ms cubic-bezier(.2,.9,.25,1), box-shadow 420ms ease;
+  will-change: transform;
+}
+.brand-wrap:hover .brand-logo { transform: rotate(6deg) scale(1.08); box-shadow: 0 12px 30px rgba(0,0,0,0.06); }
+
+/* Center nav links: subtle float + gradient underline */
+.main-nav .nav-link {
+  transition: transform 220ms ease, color 220ms ease;
+  position: relative;
+  font-size: 19px;
+  margin-left: 20px;
+  font-weight: 500;
+}
+.main-nav .nav-link:hover { transform: translateY(-4px); color: #111 !important; }
+
+/* underline effect (works even with bootstrap) */
+.main-nav .nav-link::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  transform: translateX(-50%) scaleX(0);
+  width: 60%;
+  height: 3px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #ffd87a, #ff9a5a);
+  transform-origin: center;
+  transition: transform 300ms cubic-bezier(.2,.9,.25,1), opacity 220ms ease;
+  opacity: 0;
+}
+.main-nav .nav-link:hover::after,
+.main-nav .nav-link.active::after { transform: translateX(-50%) scaleX(1); opacity: 1; }
+
+/* Icon buttons: lift + rotate icon */
+.icon-btn { transition: transform 220ms ease, box-shadow 220ms ease; }
+.icon-btn:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(12,18,28,0.08); }
+.icon-btn i { transition: transform 360ms ease; }
+.icon-btn:hover i { transform: rotate(-12deg); }
+
+/* Mobile offcanvas links — keep your nice slide bg (already added), ensure z-index */
+.offcanvas .mobile-links .nav-link { position: relative; z-index: 2; }
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* ============================================================
+   INFINITY LOOP MOVING NAVBAR BACKGROUND
+   Paste at the very END of your <style>
+   ============================================================ */
+/* === Force-visible Infinity-loop navbar background (paste LAST) === */
+/* Ensures this rule overrides earlier declarations and shows clear motion */
+
+
+/* Ensure no descendant overlays hide the navbar gradient */
+/* nav.mega-nav *,
+nav.mega-nav .container-fluid,
+nav.mega-nav .container {
+  background: transparent !important;
+} */
+
+/* Slight stronger hover to see glow */
+nav.mega-nav:hover {
+  box-shadow: 0 18px 48px rgba(255,175,95,0.22) !important;
+}
+
+@keyframes infinityMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+/* fallback for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  nav.mega-nav { animation: none !important; background-position: 50% 50% !important; }
+}
 
 /* Responsive */
 @media (max-width: 992px) {
@@ -269,6 +374,10 @@
 
             /* hide center links on md-down */
         }
+
+
+        
+
     </style>
 </head>
 
@@ -409,6 +518,39 @@
       window.location.reload();
     }
   });
+
+
+  /* Minimal script: set body padding to avoid nav overlap & toggle .scrolled */
+(function(){
+  const nav = document.querySelector('nav.mega-nav');
+  if (!nav) return;
+
+  function setBodyPadding(){
+    const h = Math.ceil(nav.getBoundingClientRect().height || 80);
+    document.body.style.paddingTop = h + 'px';
+  }
+
+  // set on load
+  window.addEventListener('load', setBodyPadding, { passive: true });
+  // set immediately for fast paint
+  setBodyPadding();
+
+  // update on resize
+  let t = null;
+  window.addEventListener('resize', function(){
+    clearTimeout(t);
+    t = setTimeout(setBodyPadding, 120);
+  }, { passive: true });
+
+  // toggle scrolled class
+  function onScroll(){
+    const threshold = 60;
+    if ((window.scrollY || window.pageYOffset) > threshold) nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
 
 </script>
 {% block extra_js %}{% endblock %}

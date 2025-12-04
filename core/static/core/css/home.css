@@ -221,8 +221,35 @@
   }
 }
 
+/* ------------------ */
+/* Trigger-on-scroll helper (append to end of your category CSS) */
+
+.category-card {
+  /* hide by default before in-view */
+  opacity: 0;
+  transform: translateY(22px) scale(.995);
+  will-change: transform, opacity;
+  /* prevent the old automatic animation from running */
+  animation: none !important;
+}
+
+/* when JS adds .animate the floatIn animation will run */
+.category-card.animate {
+  animation: floatIn 700ms cubic-bezier(.16,.84,.28,1) both;
+}
+
+/* optional: make sure nth-child delays in CSS don't interfere
+   (we will set delay from JS inline for cleaner control) */
+.category-card[style*="animation-delay"] { /* no-op selector to keep CSS valid */ }
+
+/* Accessibility: if user prefers reduced motion, reveal instantly */
+@media (prefers-reduced-motion: reduce) {
+  .category-card { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
+
+
 /* ==== Promo Banner ==== */
-.promo-banner{
+/* .promo-banner{
 max-width: 1200px;
   margin: auto;
 }
@@ -276,6 +303,153 @@ max-width: 1200px;
 .btn-green:hover {
   background: #218838;
   transform: scale(1.05);
+} */
+
+
+/* ---------- Promo Carousel (infinite loop) ---------- */
+.promo-banner-carousel {
+  max-width: 1200px;
+  margin: 28px auto;
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(18,22,30,0.06);
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(250,250,248,0.96));
+  box-shadow: 0 12px 40px rgba(12,16,24,0.06);
+}
+
+/* viewport that masks the moving track */
+.promo-carousel-viewport {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  border-radius: 10px;
+}
+
+/* track: two sets of slides side-by-side for seamless loop */
+.promo-carousel-track {
+  display: flex;
+  gap: 28px;
+  align-items: stretch;
+  /* animation: translate left by 50% (one copy width) */
+  animation: carouselScroll 22s linear infinite;
+  padding: 22px;
+  box-sizing: content-box;
+}
+
+
+/* slide/card */
+.promo-card {
+  flex: 0 0 calc(25% - 28px); /* four items visible (25%), gap accounted */
+  min-width: 260px;
+  background: linear-gradient(180deg,#ffffff,#fffaf6);
+  border-radius: 12px;
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  padding: 14px;
+  box-shadow: 0 10px 30px rgba(12,16,24,0.06);
+  transition: transform .45s cubic-bezier(.2,.9,.25,1), box-shadow .35s ease;
+  border: 1px solid rgba(16,22,34,0.04);
+}
+
+/* visual emphasis when hovering an individual card */
+.promo-card:hover {
+  transform: translateY(-12px) rotateX(3deg) scale(1.02);
+  box-shadow: 0 30px 70px rgba(12,16,24,0.12);
+  z-index: 6;
+}
+
+/* image area */
+.promo-card .promo-img {
+  flex: 0 0 46%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.promo-card .promo-img img {
+  width: 100%;
+  max-width: 260px;
+  height: auto;
+  border-radius: 10px;
+  transform-origin: center;
+  transition: transform .7s cubic-bezier(.2,.9,.25,1);
+  will-change: transform;
+}
+
+/* text area */
+.promo-card .promo-text {
+  flex: 1;
+  padding-right: 8px;
+}
+.promo-card .promo-text h3 { font-size: 20px; margin: 0 0 8px; font-weight: 800; color:#222; }
+.promo-card .promo-text p { font-size: 14.5px; margin: 0 0 12px; color:#444; line-height:1.45; }
+
+/* button */
+.promo-card .btn-green {
+  font-size: 14.5px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.08);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.promo-card .btn-green:hover { transform: translateY(-2px) scale(1.03); box-shadow:0 12px 30px rgba(24,40,20,0.06); }
+
+/* hover micro-animations on contents (spin/tilt/zoom/bounce) */
+.promo-card:hover .promo-img img {
+  transform: rotate(-6deg) scale(1.06) translateY(-6px);
+  animation: imgMicro 1000ms ease forwards;
+}
+@keyframes imgMicro {
+  0% { transform: rotate(0) scale(1); }
+  40% { transform: rotate(8deg) scale(1.08) translateY(-6px); }
+  100% { transform: rotate(-6deg) scale(1.06) translateY(-6px); }
+}
+
+/* subtle title shimmer on hover */
+.promo-card:hover .promo-text h3 { animation: titleShimmer 1.2s linear 0s 1; }
+@keyframes titleShimmer {
+  0% { color:#222; text-shadow:none; transform:translateY(0); }
+  50% { color:#b8860b; text-shadow:0 10px 30px rgba(184,134,11,0.12); transform: translateY(-4px); }
+  100% { color:#222; transform: translateY(0); }
+}
+
+/* duplicated slides should be visually identical but ignored by screen readers */
+.promo-card.dup { opacity: 1; }
+
+/* carousel animation: move left by half the track width (since content duplicated) */
+@keyframes carouselScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); } /* -50% moves one copy width */
+}
+
+/* make the track width double (we rely on duplicating slides to create loop) */
+.promo-carousel-track {
+  width: calc( (100% + 28px) * 2 ); /* visual; flex will layout duplicates */
+}
+
+/* make sure duplicated items don't receive focus */
+.promo-card.dup [href], .promo-card.dup button { pointer-events: none; }
+
+/* responsive: fewer cards on small screens */
+@media (max-width: 992px) {
+  .promo-card { flex: 0 0 calc(50% - 18px); }
+  .promo-card .promo-img { flex: 0 0 48%; }
+  .promo-carousel-track { padding: 16px; gap: 18px; animation-duration: 18s; }
+}
+@media (max-width: 640px) {
+  .promo-card { flex: 0 0 calc(90% - 18px); flex-direction: column; gap:12px; min-width: 300px; }
+  .promo-card .promo-img { flex: 0 0 auto; width: 100%; }
+  .promo-card .promo-text { padding: 0; }
+  .promo-carousel-track { animation-duration: 14s; gap: 12px; padding: 12px; }
+}
+
+/* respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .promo-carousel-track { animation-play-state: paused; }
+  .promo-carousel-viewport:hover .promo-carousel-track { animation-play-state: running; }
+
+  .promo-card, .promo-card .promo-img img { transition: none; transform: none !important; }
 }
 
 /* ==== Trending Section ==== */
@@ -626,6 +800,41 @@ max-width: 1200px;
   max-width: 1200px;
   margin: auto;
 }
+/* .arrival_new{
+  background:black;
+  width:90%;
+  margin:auto;
+  padding:30px;
+} */
+ .arrival_new {
+  position: relative;
+  background: #949393;       /* black base */
+  width: 90%;
+  margin: auto;
+  padding: 30px;
+  overflow: hidden;       /* keep overlay inside */
+}
+
+.arrival_new::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.08),
+      rgba(255, 255, 255, 0.03)
+  );
+  opacity: 0.35;          /* adjust softness */
+  pointer-events: none;   /* don’t block clicks */
+  z-index: 0;
+}
+
+/* make the content stay above */
+.arrival_new * {
+  position: relative;
+  z-index: 2;
+}
+
 .faq-section {
   max-width: 800px;
   margin: 50px auto;
@@ -856,4 +1065,208 @@ max-width: 1200px;
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .toast { animation: none !important; transition: none !important; transform: none !important; }
+}
+
+
+/* =========================
+   EXTRA "WOW" ANIMATIONS
+   Append to end of home.css
+   ========================= */
+
+/* Subtle stagger helper for lists (applied via nth-child selectors below) */
+.animated-stagger { opacity: 0; transform: translateY(18px) scale(.995); animation: wow-entrance 700ms cubic-bezier(.16,.84,.28,1) both; }
+.animated-stagger:nth-child(1){ animation-delay: 0.06s; }
+.animated-stagger:nth-child(2){ animation-delay: 0.12s; }
+.animated-stagger:nth-child(3){ animation-delay: 0.18s; }
+.animated-stagger:nth-child(4){ animation-delay: 0.24s; }
+.animated-stagger:nth-child(5){ animation-delay: 0.30s; }
+
+/* Hero / Rent banner entrance & gentle float */
+@keyframes wow-entrance {
+  0% { opacity: 0; transform: translateY(28px) scale(.995); filter: blur(6px); }
+  60% { opacity: 1; transform: translateY(-6px) scale(1.01); filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+.rent-banner { animation: wow-entrance 900ms ease both; }
+
+/* Floating slow sway for hero images to give life */
+@keyframes float-sway {
+  0% { transform: translateY(0) rotateZ(0deg); }
+  25% { transform: translateY(-6px) rotateZ(-1.2deg); }
+  50% { transform: translateY(0) rotateZ(0.6deg); }
+  75% { transform: translateY(6px) rotateZ(-0.7deg); }
+  100% { transform: translateY(0) rotateZ(0deg); }
+}
+.rent-images .img-front img,
+.rent-images .img-back img {
+  will-change: transform;
+  animation: float-sway 6.8s ease-in-out infinite;
+  transform-origin: 50% 50%;
+}
+
+/* Hero image subtle orbit (background behind foreground) */
+@keyframes orbit-slow {
+  0% { transform: translateY(0) translateX(0) rotate(0deg) scale(1); }
+  50% { transform: translateY(-8px) translateX(6px) rotate(1.2deg) scale(1.01); }
+  100% { transform: translateY(0) translateX(0) rotate(0deg) scale(1); }
+}
+.rent-images .img-back img { animation-duration: 9.6s; animation-name: orbit-slow, float-sway; }
+
+/* Promo hero "pop & spin" to draw attention */
+@keyframes pop-spin {
+  0% { transform: scale(.94) rotate(-2deg); opacity: 0; }
+  60% { transform: scale(1.06) rotate(2deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.promo-img img { transform-origin: center; animation: pop-spin 900ms cubic-bezier(.2,.9,.25,1) both; }
+
+/* Promo text letter bounce for headings */
+@keyframes title-bounce {
+  0% { transform: translateY(14px) skewY(0deg); opacity: 0; }
+  60% { transform: translateY(-6px) skewY(-2deg); opacity: 1; }
+  100% { transform: translateY(0) skewY(0deg); opacity: 1; }
+}
+.promo-text h3 { animation: title-bounce 900ms cubic-bezier(.18,.85,.32,1) both; }
+
+/* Button micro pulses and bounce */
+@keyframes btn-pulse {
+  0% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+  50% { transform: scale(1.03); box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
+  100% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+}
+.btn-green, .btn-yellow, .btn-rent {
+  will-change: transform, box-shadow;
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+.btn-green:hover, .btn-yellow:hover, .btn-rent:hover {
+  animation: btn-pulse 700ms ease forwards;
+}
+
+/* Product cards: 3D tilt on hover + energy wobble */
+@keyframes wobble-shine {
+  0% { transform: rotateX(0) rotateY(0) translateY(0); }
+  30% { transform: rotateX(1.2deg) rotateY(-1deg) translateY(-5px); }
+  60% { transform: rotateX(-.8deg) rotateY(.6deg) translateY(-2px); }
+  100% { transform: rotateX(0) rotateY(0) translateY(0); }
+}
+.product-card { transform-style: preserve-3d; perspective: 1200px; }
+.product-card:hover { animation: wobble-shine 720ms cubic-bezier(.16,.84,.28,1); }
+
+/* Category cards: layered shimmer + bounce on hover */
+@keyframes gold-shimmer {
+  0% { background-position: -200% 0; opacity: 0; }
+  40% { opacity: 0.18; }
+  100% { background-position: 200% 0; opacity: 0; }
+}
+.category-card::before {
+  background-image: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.18), rgba(255,255,255,0));
+  background-size: 300% 100%;
+}
+.category-card:hover::before { animation: gold-shimmer 1100ms linear forwards; }
+
+/* A playful bounce for category images when hovering */
+@keyframes img-bounce {
+  0% { transform: translateY(0) scale(1) rotateX(0); }
+  30% { transform: translateY(-10px) scale(1.08) rotateX(2deg); }
+  60% { transform: translateY(-4px) scale(1.04) rotateX(0.6deg); }
+  100% { transform: translateY(0) scale(1) rotateX(0); }
+}
+.category-card img { transition: transform 560ms cubic-bezier(.2,.9,.25,1); will-change: transform; }
+.category-card:hover img { animation: img-bounce 560ms ease forwards; }
+
+/* A subtle spinning gem accent on the first letter (title) */
+@keyframes spin-gem {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.04); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+.category-card h3::first-letter { display: inline-block; transform-origin: center; transition: transform .45s; }
+.category-card:hover h3::first-letter { animation: spin-gem 900ms ease; }
+
+/* Testimonials: gentle carousel card pop + flip-y micro */
+@keyframes testimonial-pop {
+  0% { transform: translateY(24px) scale(.98) rotateX(6deg); opacity: 0; filter: blur(6px); }
+  60% { transform: translateY(-6px) scale(1.02) rotateX(-2deg); opacity: 1; filter: blur(0); }
+  100% { transform: translateY(0) scale(1) rotateX(0); opacity: 1; filter: blur(0); }
+}
+.testimonial-card { animation: testimonial-pop 900ms cubic-bezier(.16,.84,.28,1) both; }
+
+/* Dot lively bounce */
+@keyframes dot-bounce {
+  0% { transform: translateY(0) scale(1); opacity: 0.9; }
+  50% { transform: translateY(-6px) scale(1.12); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 0.95; }
+}
+.dot { transition: transform .25s ease; }
+.dot.active { animation: dot-bounce 700ms ease; }
+
+/* Services: card zoom + light rotate */
+@keyframes service-zoom {
+  0% { transform: scale(.98) rotate(-1deg); opacity: 0; }
+  60% { transform: scale(1.02) rotate(.6deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.service-card { animation: service-zoom 850ms cubic-bezier(.16,.84,.28,1) both; }
+
+/* Toast: pop + subtle shake when shown to emphasize success */
+@keyframes toast-pop {
+  0% { transform: translateY(-10px) scale(.98); opacity: 0; }
+  60% { transform: translateY(6px) scale(1.03); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.toast.show { animation: toast-pop 420ms cubic-bezier(.2,.9,.25,1) forwards; }
+
+/* Toast success wiggle to draw micro-attention */
+@keyframes wiggle {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-4px); }
+  100% { transform: translateX(0); }
+}
+.toast.show.success-wiggle { animation: toast-pop 420ms ease, wiggle 520ms ease 380ms; }
+
+/* Tiny floating badges/accents - pseudo elements approach (non-invasive) */
+.rent-banner::after,
+.promo-banner::after {
+  content: "";
+  position: absolute;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  top: 8%;
+  right: 6%;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 30% 30%, rgba(255,200,80,0.14), rgba(255,120,80,0.04));
+  filter: blur(18px);
+  transform: translateZ(0);
+  animation: pulse-orb 2800ms ease-in-out infinite;
+}
+@keyframes pulse-orb {
+  0% { transform: scale(.9) translateY(0); opacity: .7; }
+  50% { transform: scale(1.06) translateY(-6px); opacity: .9; }
+  100% { transform: scale(.9) translateY(0); opacity: .7; }
+}
+
+/* Accessibility: Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .animated-stagger,
+  .rent-banner,
+  .rent-images .img-front img,
+  .rent-images .img-back img,
+  .promo-img img,
+  .promo-text h3,
+  .category-card:hover img,
+  .product-card,
+  .testimonial-card,
+  .dot.active,
+  .service-card,
+  .toast.show,
+  .category-card::before,
+  .rent-banner::after,
+  .promo-banner::after {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
 }

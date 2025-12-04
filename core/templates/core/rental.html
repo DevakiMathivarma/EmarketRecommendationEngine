@@ -247,6 +247,31 @@
         opacity: 0;
     }
 
+    /* ===== Scrollable Categories List ===== */
+.category-scroll {
+    max-height: 200px;      /* adjust height as you like */
+    overflow-y: auto;
+    padding-right: 4px;     /* space for scrollbar */
+}
+
+/* smooth custom scrollbar */
+.category-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.category-scroll::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 10px;
+}
+
+.category-scroll::-webkit-scrollbar-thumb:hover {
+    background: #bbb;
+}
+
+.category-scroll::-webkit-scrollbar-track {
+    background: #f8f8f8;
+}
+
     /* === Animations === */
     @keyframes fadeInZoom {
         0% {
@@ -276,31 +301,35 @@
         text-shadow: 3px 6px 15px rgba(0, 0, 0, 0.8);
         transition: all .4s ease-in-out;
     }
-        @media (max-width:1024px){
+
+    @media (max-width:1024px) {
         .product-grid {
-       
-        grid-template-columns: repeat(3,1fr);
-        
+
+            grid-template-columns: repeat(3, 1fr);
+
+        }
     }
-    }
-    @media (max-width:768px){
+
+    @media (max-width:768px) {
         .product-grid {
-       
-        grid-template-columns: repeat(2,1fr);
-        
+
+            grid-template-columns: repeat(2, 1fr);
+
+        }
     }
-    }
-    @media (max-width:600px){
-            .rental-container {
-       grid-template-columns: repeat(1,1fr);
-       margin: auto 20px;
-        
-    }
-       .product-grid {
-       
-        grid-template-columns: repeat(1,1fr);
-        
-    }
+
+    @media (max-width:600px) {
+        .rental-container {
+            grid-template-columns: repeat(1, 1fr);
+            margin: auto 20px;
+
+        }
+
+        .product-grid {
+
+            grid-template-columns: repeat(1, 1fr);
+
+        }
     }
 </style>
 {% endblock %}
@@ -323,22 +352,24 @@
     <div class="filters">
         <!-- Categories -->
         <h4>Categories</h4>
+        <div class="category-scroll">
         <ul>
             <li><a href="?category=all"
                     class="{% if request.GET.category == 'all' or not request.GET.category %}active{% endif %}">All</a>
             </li>
-          <ul>
-{% for cat in categories %}
-    <li>
-        <a href="?category={{ cat.name }}" 
-           class="{% if request.GET.category == cat.name %}active{% endif %}">
-           {{ cat.name }}
-        </a>
-    </li>
-{% endfor %}
-</ul>
+            <ul>
+                {% for cat in categories %}
+                <li>
+                    <a href="?category={{ cat.name }}"
+                        class="{% if request.GET.category == cat.name %}active{% endif %}">
+                        {{ cat.name }}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
 
         </ul>
+        </div>
 
         <div class="separator"></div>
 
@@ -416,10 +447,11 @@
                     <span class="price">₹{{ product.price_per_day }}/day</span>
                     {% if user.is_authenticated %}
                     <a href="{% url 'add_to_cart' product.id %}"
-                        onclick="alert('✅ {{ product.name }} rented successfully!');" class="btn-rent">Rent Now</a>
+                        onclick="alert('✅ {{ product.name }} added to cart successfully!');" class="btn-rent">Rent
+                        Now</a>
                     {% else %}
-                    <a href="{% url 'login' %}" onclick="alert('⚠️ Please login to rent this product');"
-                        class="btn-rent">Rent Now</a>
+                    <a href="{% url 'login' %}" onclick="alert('⚠️ Please login to add this product');"
+                        class="btn-rent">Add to cart</a>
                     {% endif %}
 
                 </div>

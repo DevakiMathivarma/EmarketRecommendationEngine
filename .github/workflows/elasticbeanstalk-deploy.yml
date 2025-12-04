@@ -24,9 +24,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id:  AKIAR65XBVPARNFMK4F2Y
-          aws-secret-access-key:  fqmA+qzJcNcFz5RtjXWMMq8GQz4M5QjtNAfEwgz2
-          aws-region: ap-south-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Deploy to EB
         run: eb deploy --staged
