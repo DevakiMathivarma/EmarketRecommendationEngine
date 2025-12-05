@@ -447,8 +447,8 @@
                     <span class="price">₹{{ product.price_per_day }}/day</span>
                     {% if user.is_authenticated %}
                     <a href="{% url 'add_to_cart' product.id %}"
-                        onclick="alert('✅ {{ product.name }} added to cart successfully!');" class="btn-rent">Rent
-                        Now</a>
+                        onclick="alert('✅ {{ product.name }} added to cart successfully!');" class="btn-rent">Add to cart
+                        </a>
                     {% else %}
                     <a href="{% url 'login' %}" onclick="alert('⚠️ Please login to add this product');"
                         class="btn-rent">Add to cart</a>

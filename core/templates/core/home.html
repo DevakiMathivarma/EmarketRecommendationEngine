@@ -139,7 +139,7 @@
 
     <!-- Right Images -->
     <div class="rent-images">
-      <div class="img-back"><img src="media\static\core\ecom\art_and_craft\image13.jpg" alt="Jewelry Model"></div>
+      <div class="img-back"><img src="media\static\core\ecom\lighting_and_lamps\image27.jpg" alt="Jewelry Model"></div>
       <div class="img-front">
         <img src="media/static/core/images/image.png" alt="Jewelry Model">
       </div>
@@ -175,7 +175,7 @@
   <h2 class="section-title">New Arrivals</h2>
   <p class="section-subtitle">Explore the newest additions to our collection</p>
 </div>
-<div class="arrival_new">
+<div class="arrival">
   {% for category in categories %}
   <div class="category-block">
 
@@ -231,71 +231,71 @@
 </div>
 
 <!-- Promo Banner -->
-
-<section class="promo-banner-carousel" aria-label="Promotions">
-  <div class="promo-carousel-viewport">
-    <div class="promo-carousel-track">
-      <!-- slide 1 (uses your banner variable) -->
-      <article class="promo-card" role="group" aria-roledescription="slide" aria-label="Promo 1">
-        <div class="promo-img"><img src="{{ banner.product_image.url }}" alt="Promo image 1"></div>
-        <div class="promo-text">
+<section class="promo-loop" aria-label="Promotions">
+  <div class="promo-viewport">
+    <div class="promo-track">
+      <!-- slide 1 -->
+      <article class="promo-slide" role="group" aria-roledescription="slide" aria-label="Promo 1">
+        <div class="slide-img"><img src="{{ banner.product_image.url }}" alt="Promo image 1"></div>
+        <div class="slide-content">
           <h3>{{ banner.title }}</h3>
-          <p>{{ banner.subtitle }}</p>
+          <p>{{ banner.subtitle |truncatewords:10 }}</p>
           {% if promo.code %}<small>Use code <b>{{ promo.code }}</b></small>{% endif %}
-          <a href="{% url 'rental_page' %}" class="btn-green">{{ banner.button_text }}</a>
+          <a href="{% url 'rental_page' %}" class="btn-accent">{{ banner.button_text }}</a>
         </div>
       </article>
 
       <!-- slide 2 -->
-      <article class="promo-card" role="group" aria-roledescription="slide" aria-label="Promo 2">
-        <div class="promo-img"><img src="media\static\core\ecom\ethnic_wear\image7.jpg" alt="Promo image 2"></div>
-        <div class="promo-text">
+      <article class="promo-slide" role="group" aria-roledescription="slide" aria-label="Promo 2">
+        <div class="slide-img"><img src="media/static/core/ecom/ethnic_wear/image7.jpg" alt="Promo image 2"></div>
+        <div class="slide-content">
           <h3>Seasonal Picks</h3>
           <p>Limited time styles picked for this season.</p>
-          <a href="{% url 'rental_page' %}" class="btn-green">Shop Now</a>
+          <a href="{% url 'rental_page' %}" class="btn-accent">Shop Now</a>
         </div>
       </article>
 
       <!-- slide 3 -->
-      <article class="promo-card" role="group" aria-roledescription="slide" aria-label="Promo 3">
-        <div class="promo-img"><img src="media\static\core\ecom\ethnic_wear\image23.jpg" alt="Promo image 3"></div>
-        <div class="promo-text">
+      <article class="promo-slide" role="group" aria-roledescription="slide" aria-label="Promo 3">
+        <div class="slide-img"><img src="media/static/core/ecom/ethnic_wear/image23.jpg" alt="Promo image 3"></div>
+        <div class="slide-content">
           <h3>Best Sellers</h3>
           <p>Top rated items customers love — trending now.</p>
-          <a href="{% url 'rental_page' %}" class="btn-green">Explore</a>
+          <a href="{% url 'rental_page' %}" class="btn-accent">Explore</a>
         </div>
       </article>
 
       <!-- slide 4 -->
-      <article class="promo-card" role="group" aria-roledescription="slide" aria-label="Promo 4">
-        <div class="promo-img"><img src="media\static\core\ecom\cookware_and_utensils\image6.jpg" alt="Promo image 4"></div>
-        <div class="promo-text">
+      <article class="promo-slide" role="group" aria-roledescription="slide" aria-label="Promo 4">
+        <div class="slide-img"><img src="media/static/core/ecom/cookware_and_utensils/image6.jpg" alt="Promo image 4"></div>
+        <div class="slide-content">
           <h3>New Arrivals</h3>
           <p>Freshly added — discover new arrivals daily.</p>
-          <a href="{% url 'rental_page' %}" class="btn-green">Discover</a>
+          <a href="{% url 'rental_page' %}" class="btn-accent">Discover</a>
         </div>
       </article>
 
       <!-- duplicated slides for smooth infinite loop -->
-      <article class="promo-card dup" aria-hidden="true">
-        <div class="promo-img"><img src="{{ banner.product_image.url }}" alt=""></div>
-        <div class="promo-text"><h3>{{ banner.title }}</h3><p>{{ banner.subtitle }}</p><a class="btn-green" href="{% url 'rental_page' %}">{{ banner.button_text }}</a></div>
+      <article class="promo-slide slide-dup" aria-hidden="true">
+        <div class="slide-img"><img src="{{ banner.product_image.url }}" alt=""></div>
+        <div class="slide-content"><h3>{{ banner.title }}</h3><p>{{ banner.subtitle |truncatewords:10 }}</p><a class="btn-accent" href="{% url 'rental_page' %}">{{ banner.button_text }}</a></div>
       </article>
-      <article class="promo-card dup" aria-hidden="true">
-        <div class="promo-img"><img src="{% static 'core/images/banner1.png' %}" alt=""></div>
-        <div class="promo-text"><h3>Seasonal Picks</h3><p>Limited time styles.</p><a class="btn-green" href="{% url 'rental_page' %}">Shop Now</a></div>
+      <article class="promo-slide slide-dup" aria-hidden="true">
+        <div class="slide-img"><img src="{% static 'core/images/banner1.png' %}" alt=""></div>
+        <div class="slide-content"><h3>Seasonal Picks</h3><p>Limited time styles.</p><a class="btn-accent" href="{% url 'rental_page' %}">Shop Now</a></div>
       </article>
-      <article class="promo-card dup" aria-hidden="true">
-        <div class="promo-img"><img src="{% static 'core/images/banner2.png' %}" alt=""></div>
-        <div class="promo-text"><h3>Best Sellers</h3><p>Top rated items.</p><a class="btn-green" href="{% url 'rental_page' %}">Explore</a></div>
+      <article class="promo-slide slide-dup" aria-hidden="true">
+        <div class="slide-img"><img src="{% static 'core/images/banner2.png' %}" alt=""></div>
+        <div class="slide-content"><h3>Best Sellers</h3><p>Top rated items.</p><a class="btn-accent" href="{% url 'rental_page' %}">Explore</a></div>
       </article>
-      <article class="promo-card dup" aria-hidden="true">
-        <div class="promo-img"><img src="{% static 'core/images/banner3.png' %}" alt=""></div>
-        <div class="promo-text"><h3>New Arrivals</h3><p>Freshly added.</p><a class="btn-green" href="{% url 'rental_page' %}">Discover</a></div>
+      <article class="promo-slide slide-dup" aria-hidden="true">
+        <div class="slide-img"><img src="{% static 'core/images/banner3.png' %}" alt=""></div>
+        <div class="slide-content"><h3>New Arrivals</h3><p>Freshly added.</p><a class="btn-accent" href="{% url 'rental_page' %}">Discover</a></div>
       </article>
     </div>
   </div>
 </section>
+
 
 
 <!-- Trending Now -->
@@ -579,64 +579,56 @@
   });
 
 
+(function() {
+  // Respect reduced motion users
+  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) {
+    document.querySelectorAll('.category-card').forEach(c => {
+      c.style.opacity = '1';
+      c.style.transform = 'none';
+      c.setAttribute('data-animated', 'true');
+    });
+    return;
+  }
 
-  (function () {
-    // Respect reduced motion users: don't animate, just reveal
-    const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduceMotion) {
-      document.querySelectorAll('.category-card').forEach(c => {
-        c.style.opacity = 1;
-        c.style.transform = 'none';
+  const grid = document.querySelector('.category-grid');
+  if (!grid) return;
+
+  const cards = Array.from(grid.querySelectorAll('.category-card'));
+  if (!cards.length) return;
+
+  const STAGGER = 90; // ms between card reveals
+  const ioOptions = { root: null, rootMargin: '0px 0px -10% 0px', threshold: 0.06 };
+
+  const revealed = new WeakSet();
+
+  const io = new IntersectionObserver((entries, observer) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+
+      // get the index of the first visible card within the grid
+      // We'll reveal cards in DOM order with a small stagger
+      cards.forEach((card, idx) => {
+        if (revealed.has(card)) return; // already animated
+        setTimeout(() => {
+          // mark as revealed — use attribute so selector matches CSS above
+          card.setAttribute('data-animated', 'true');
+          // optional per-card animation delay to ensure nice staggering
+          card.style.animationDelay = '0ms';
+          // ensure visible even if animation hasn't started
+          card.style.opacity = '1';
+        }, idx * STAGGER);
+        revealed.add(card);
       });
-      return;
+
+      // once we've scheduled reveal for all cards, stop observing
+      observer.disconnect();
+      break;
     }
+  }, ioOptions);
 
-    const cards = Array.from(document.querySelectorAll('.category-grid .category-card'));
-    if (!cards.length) return;
-
-    // Stagger in ms between cards
-    const STAGGER = 90;
-
-    // IntersectionObserver options - trigger when ~20% visible
-    const ioOptions = {
-      root: null,
-      rootMargin: '0px 0px -10% 0px', // trigger slightly before fully entering view
-      threshold: 0.06
-    };
-
-    let animatedCount = 0;
-
-    const io = new IntersectionObserver((entries, observer) => {
-      // For each entry that intersects, start staggered animation for visible group
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-
-        // find starting index of visible cards: we want to animate only the cards inside the grid
-        // But easiest: animate every card in order but only if not already animated
-        cards.forEach((card, idx) => {
-          if (card.classList.contains('animate')) return; // skip already animated
-          // delay each card relative to its index from start
-          const delay = idx * STAGGER;
-          // schedule animation with inline style for delay
-          setTimeout(() => {
-            // play animation by adding class and setting inline delay
-            card.style.animationDelay = '0ms'; // immediate when class added, we control stagger via setTimeout
-            card.classList.add('animate');
-            // ensure visible immediately
-            card.style.opacity = 1;
-          }, delay);
-        });
-
-        // all scheduled — we can stop observing once triggered
-        observer.disconnect();
-      });
-    }, ioOptions);
-
-    // start observing the grid container (we'll trigger when it comes into view)
-    const grid = document.querySelector('.category-grid');
-    if (grid) io.observe(grid);
-
-  })();
+  io.observe(grid);
+})();
 
 
 </script>

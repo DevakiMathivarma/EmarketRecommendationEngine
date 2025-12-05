@@ -223,29 +223,41 @@
 
 /* ------------------ */
 /* Trigger-on-scroll helper (append to end of your category CSS) */
+/* ========= Intersection-triggered reveal for .category-card =========
+   Paste this at the END of your CSS file (e.g. core/css/home.css)
+   Uses the same selectors you already have (no class name changes)
+   ================================================================== */
 
 .category-card {
-  /* hide by default before in-view */
+  /* start hidden until JS reveals */
   opacity: 0;
   transform: translateY(22px) scale(.995);
   will-change: transform, opacity;
-  /* prevent the old automatic animation from running */
-  animation: none !important;
+  animation: none !important; /* prevent any prior auto animation */
 }
 
-/* when JS adds .animate the floatIn animation will run */
-.category-card.animate {
+/* When JS sets `data-animated="true"` the animation runs.
+   Using attribute avoids adding/removing classes if your pipeline prefers attributes. */
+.category-card[data-animated="true"] {
   animation: floatIn 700ms cubic-bezier(.16,.84,.28,1) both;
 }
 
-/* optional: make sure nth-child delays in CSS don't interfere
-   (we will set delay from JS inline for cleaner control) */
-.category-card[style*="animation-delay"] { /* no-op selector to keep CSS valid */ }
-
-/* Accessibility: if user prefers reduced motion, reveal instantly */
-@media (prefers-reduced-motion: reduce) {
-  .category-card { animation: none !important; opacity: 1 !important; transform: none !important; }
+/* Keep floatIn keyframes if you already have them; re-declare safely if needed */
+@keyframes floatIn {
+  0% { opacity: 0; transform: translateY(22px) scale(.995); filter: blur(6px); }
+  60% { opacity: 1; transform: translateY(-6px) scale(1.01); filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
 }
+
+/* Accessibility: if user requests reduced motion, reveal instantly */
+@media (prefers-reduced-motion: reduce) {
+  .category-card {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 
 
 /* ==== Promo Banner ==== */
@@ -306,25 +318,7 @@ max-width: 1200px;
 } */
 
 
-/* ---------- Promo Carousel (infinite loop) ---------- */
-.promo-banner-carousel {
-  max-width: 1200px;
-  margin: 28px auto;
-  padding: 18px;
-  border-radius: 14px;
-  border: 1px solid rgba(18,22,30,0.06);
-  overflow: hidden;
-  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(250,250,248,0.96));
-  box-shadow: 0 12px 40px rgba(12,16,24,0.06);
-}
 
-/* viewport that masks the moving track */
-.promo-carousel-viewport {
-  overflow: hidden;
-  position: relative;
-  width: 100%;
-  border-radius: 10px;
-}
 
 
 /* .arrival_new{
@@ -334,51 +328,88 @@ max-width: 1200px;
   padding:30px;
 } */
 /* ---- */
- .arrival_new {
+ /* .arrival {
   position: relative;
-  background: #949393;       /* black base */
+  background: #edeaea;       
   width: 90%;
   margin: auto;
   padding: 30px;
-  overflow: hidden;       /* keep overlay inside */
+  overflow: hidden;       
+} */
+.arrival {
+  width: 90%;
+  margin: auto;
+  padding: 30px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ffe7d1, #ffd1dc);
+  animation: breatheColors 8s ease-in-out infinite;
+  background-size: 200% 200%;
 }
 
-.arrival_new::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.08),
-      rgba(255, 255, 255, 0.03)
-  );
-  opacity: 0.35;          /* adjust softness */
-  pointer-events: none;   /* don’t block clicks */
-  z-index: 0;
+@keyframes breatheColors {
+  0% {
+    background-position: 0% 50%;
+    filter: brightness(1);
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: brightness(1.15); /* subtle glow */
+  }
+  100% {
+    background-position: 0% 50%;
+    filter: brightness(1);
+  }
 }
 
-/* make the content stay above */
-.arrival_new * {
+
+
+/* ===========================
+   Promo Carousel v3 (new class names)
+   Drop-in replacement: paste at END of your CSS file
+   Uses unique keyframes and strong rules so it overrides older reverted CSS
+   =========================== */
+
+.promo-loop {
+  max-width: 1200px;
+  margin: 28px auto;
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(18,22,30,0.06);
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(255,255,255,0.985), rgba(250,250,248,0.985));
+  box-shadow: 0 12px 40px rgba(12,16,24,0.06);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* viewport that masks the moving track */
+.promo-viewport {
+  overflow: hidden;
   position: relative;
-  z-index: 2;
+  width: 100%;
+  border-radius: 10px;
 }
-/* ---- */
 
-/* track: two sets of slides side-by-side for seamless loop */
-.promo-carousel-track {
+/* track: flex row, duplicated slides needed in HTML */
+.promo-track {
   display: flex;
   gap: 28px;
   align-items: stretch;
-  /* animation: translate left by 50% (one copy width) */
-  animation: carouselScroll 22s linear infinite;
   padding: 22px;
   box-sizing: content-box;
+  animation: promo_track_slide_v3 22s linear infinite !important;
+  will-change: transform;
 }
 
+/* pause when user hovers or focuses the viewport */
+.promo-viewport:hover .promo-track,
+.promo-viewport:focus-within .promo-track {
+  animation-play-state: paused !important;
+}
 
-/* slide/card */
-.promo-card {
-  flex: 0 0 calc(25% - 28px); /* four items visible (25%), gap accounted */
+/* single slide/card */
+.promo-slide {
+  flex: 0 0 calc(25% - 28px);
   min-width: 260px;
   background: linear-gradient(180deg,#ffffff,#fffaf6);
   border-radius: 12px;
@@ -389,105 +420,102 @@ max-width: 1200px;
   box-shadow: 0 10px 30px rgba(12,16,24,0.06);
   transition: transform .45s cubic-bezier(.2,.9,.25,1), box-shadow .35s ease;
   border: 1px solid rgba(16,22,34,0.04);
+  transform-origin: center center;
+  will-change: transform;
 }
 
-/* visual emphasis when hovering an individual card */
-.promo-card:hover {
-  transform: translateY(-12px) rotateX(3deg) scale(1.02);
-  box-shadow: 0 30px 70px rgba(12,16,24,0.12);
-  z-index: 6;
+/* hover emphasis */
+.promo-slide:hover {
+  transform: translateY(-12px) rotateX(3deg) scale(1.02) !important;
+  box-shadow: 0 30px 70px rgba(12,16,24,0.12) !important;
+  z-index: 6 !important;
 }
 
 /* image area */
-.promo-card .promo-img {
+.slide-img {
   flex: 0 0 46%;
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.promo-card .promo-img img {
+.slide-img img {
   width: 100%;
   max-width: 260px;
   height: auto;
   border-radius: 10px;
   transform-origin: center;
-  transition: transform .7s cubic-bezier(.2,.9,.25,1);
+  transition: transform .7s cubic-bezier(.2,.9,.25,1), filter .5s ease;
   will-change: transform;
 }
 
-/* text area */
-.promo-card .promo-text {
-  flex: 1;
-  padding-right: 8px;
-}
-.promo-card .promo-text h3 { font-size: 20px; margin: 0 0 8px; font-weight: 800; color:#222; }
-.promo-card .promo-text p { font-size: 14.5px; margin: 0 0 12px; color:#444; line-height:1.45; }
+/* text */
+.slide-content { flex: 1; padding-right: 8px; }
+.slide-content h3 { font-size: 20px; margin: 0 0 8px; font-weight: 800; color:#222; }
+.slide-content p { font-size: 14.5px; margin: 0 0 12px; color:#444; line-height:1.45; }
 
 /* button */
-.promo-card .btn-green {
+.btn-accent {
   font-size: 14.5px;
   padding: 8px 14px;
   border-radius: 8px;
   border: 1px solid rgba(0,0,0,0.08);
   transition: transform .2s ease, box-shadow .2s ease;
+  background: linear-gradient(90deg,#ffb84d,#ff7a59);
+  color: #111;
+  text-decoration: none;
+  display: inline-block;
 }
-.promo-card .btn-green:hover { transform: translateY(-2px) scale(1.03); box-shadow:0 12px 30px rgba(24,40,20,0.06); }
+.btn-accent:hover { transform: translateY(-2px) scale(1.03) !important; box-shadow:0 12px 30px rgba(24,40,20,0.06) !important; }
 
-/* hover micro-animations on contents (spin/tilt/zoom/bounce) */
-.promo-card:hover .promo-img img {
-  transform: rotate(-6deg) scale(1.06) translateY(-6px);
-  animation: imgMicro 1000ms ease forwards;
+/* hover micro for image */
+.promo-slide:hover .slide-img img {
+  transform: rotate(-6deg) scale(1.06) translateY(-6px) !important;
+  animation: promo_img_micro_v3 1000ms ease forwards !important;
 }
-@keyframes imgMicro {
+@keyframes promo_img_micro_v3 {
   0% { transform: rotate(0) scale(1); }
   40% { transform: rotate(8deg) scale(1.08) translateY(-6px); }
   100% { transform: rotate(-6deg) scale(1.06) translateY(-6px); }
 }
 
-/* subtle title shimmer on hover */
-.promo-card:hover .promo-text h3 { animation: titleShimmer 1.2s linear 0s 1; }
-@keyframes titleShimmer {
+/* title shimmer */
+.promo-slide:hover .slide-content h3 { animation: promo_title_shimmer_v3 1.2s linear 0s 1 !important; }
+@keyframes promo_title_shimmer_v3 {
   0% { color:#222; text-shadow:none; transform:translateY(0); }
   50% { color:#b8860b; text-shadow:0 10px 30px rgba(184,134,11,0.12); transform: translateY(-4px); }
   100% { color:#222; transform: translateY(0); }
 }
 
-/* duplicated slides should be visually identical but ignored by screen readers */
-.promo-card.dup { opacity: 1; }
+/* duplicated slides helper */
+.slide-dup { opacity: 1 !important; pointer-events: none !important; }
 
-/* carousel animation: move left by half the track width (since content duplicated) */
-@keyframes carouselScroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); } /* -50% moves one copy width */
+/* main track animation: translate left by 50% so duplication loops */
+@keyframes promo_track_slide_v3 {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
 }
 
-/* make the track width double (we rely on duplicating slides to create loop) */
-.promo-carousel-track {
-  width: calc( (100% + 28px) * 2 ); /* visual; flex will layout duplicates */
-}
-
-/* make sure duplicated items don't receive focus */
-.promo-card.dup [href], .promo-card.dup button { pointer-events: none; }
-
-/* responsive: fewer cards on small screens */
+/* responsive */
 @media (max-width: 992px) {
-  .promo-card { flex: 0 0 calc(50% - 18px); }
-  .promo-card .promo-img { flex: 0 0 48%; }
-  .promo-carousel-track { padding: 16px; gap: 18px; animation-duration: 18s; }
+  .promo-slide { flex: 0 0 calc(50% - 18px) !important; }
+  .slide-img { flex: 0 0 48% !important; }
+  .promo-track { padding: 16px !important; gap: 18px !important; animation-duration: 18s !important; }
 }
 @media (max-width: 640px) {
-  .promo-card { flex: 0 0 calc(90% - 18px); flex-direction: column; gap:12px; min-width: 300px; }
-  .promo-card .promo-img { flex: 0 0 auto; width: 100%; }
-  .promo-card .promo-text { padding: 0; }
-  .promo-carousel-track { animation-duration: 14s; gap: 12px; padding: 12px; }
+  .promo-slide { flex: 0 0 calc(90% - 18px) !important; flex-direction: column !important; gap:12px !important; min-width: 300px !important; }
+  .slide-img { flex: 0 0 auto !important; width: 100% !important; }
+  .slide-content { padding: 0 !important; }
+  .promo-track { animation-duration: 14s !important; gap: 12px !important; padding: 12px !important; }
 }
 
-/* respect reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .promo-carousel-track { animation-play-state: paused; }
-  .promo-carousel-viewport:hover .promo-carousel-track { animation-play-state: running; }
+/* extra safety: pause animation when user interacts via keyboard focus */
+.promo-viewport :focus { outline: none; }
+.promo-viewport :focus-visible { outline: 2px solid rgba(184,134,11,0.14); }
 
-  .promo-card, .promo-card .promo-img img { transition: none; transform: none !important; }
+/* reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .promo-track { animation: none !important; transform: none !important; }
+  .promo-slide, .slide-img img { transition: none !important; transform: none !important; }
 }
 
 /* ==== Trending Section ==== */
