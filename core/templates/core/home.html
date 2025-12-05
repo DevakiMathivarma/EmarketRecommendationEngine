@@ -630,6 +630,40 @@
   io.observe(grid);
 })();
 
+(function(){
+  // pick elements
+  const track = document.querySelector('.promo-track');
+  const viewport = document.querySelector('.promo-viewport');
+  if (!track || !viewport) return;
+
+  // When slides are duplicated in markup you should have a seamless loop.
+  // This script measures the track visible width and sets a CSS variable
+  // --promo-speed so the scrolling speed stays consistent across screen sizes & slide counts.
+
+  function updateSpeed(){
+    // total visible width to move equals half the track's scrollWidth (since duplicates)
+    const totalWidth = track.scrollWidth;
+    // fallback base speed (ms per 1000px)
+    const msPer1000 = 3600; // 3.6s per 1000px (adjust for faster/slower)
+    // compute duration proportional to distance to move (50% of track width)
+    const distance = totalWidth / 2;
+    const durationSeconds = Math.max(10, Math.round((distance / 1000) * (msPer1000/1000))); // min 10s
+    // set CSS variable
+    track.style.setProperty('--promo-speed', durationSeconds + 's');
+    // also set root var for fallback usage
+    document.documentElement.style.setProperty('--promo-speed', durationSeconds + 's');
+  }
+
+  // run on load & resize (debounced)
+  window.addEventListener('load', updateSpeed);
+  let t=0;
+  window.addEventListener('resize', function(){ clearTimeout(t); t=setTimeout(updateSpeed, 120); });
+
+  // if user prefers reduced motion, pause animation
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) track.style.animationPlayState = 'paused';
+})();
+
 
 </script>
 
