@@ -444,7 +444,7 @@
 
                 <!-- Price & Rent Now -->
                 <div class="product-footer">
-                    <span class="price">₹{{ product.price_per_day }}/day</span>
+                    <span class="price">₹{{ product.price_per_day }}</span>
                     {% if user.is_authenticated %}
                     <a href="{% url 'add_to_cart' product.id %}"
                         onclick="alert('✅ {{ product.name }} added to cart successfully!');" class="btn-rent">Add to cart
