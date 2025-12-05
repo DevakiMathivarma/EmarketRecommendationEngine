@@ -221,8 +221,47 @@
   }
 }
 
+/* ------------------ */
+/* Trigger-on-scroll helper (append to end of your category CSS) */
+/* ========= Intersection-triggered reveal for .category-card =========
+   Paste this at the END of your CSS file (e.g. core/css/home.css)
+   Uses the same selectors you already have (no class name changes)
+   ================================================================== */
+
+.category-card {
+  /* start hidden until JS reveals */
+  opacity: 0;
+  transform: translateY(22px) scale(.995);
+  will-change: transform, opacity;
+  animation: none !important; /* prevent any prior auto animation */
+}
+
+/* When JS sets `data-animated="true"` the animation runs.
+   Using attribute avoids adding/removing classes if your pipeline prefers attributes. */
+.category-card[data-animated="true"] {
+  animation: floatIn 700ms cubic-bezier(.16,.84,.28,1) both;
+}
+
+/* Keep floatIn keyframes if you already have them; re-declare safely if needed */
+@keyframes floatIn {
+  0% { opacity: 0; transform: translateY(22px) scale(.995); filter: blur(6px); }
+  60% { opacity: 1; transform: translateY(-6px) scale(1.01); filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+/* Accessibility: if user requests reduced motion, reveal instantly */
+@media (prefers-reduced-motion: reduce) {
+  .category-card {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+
+
 /* ==== Promo Banner ==== */
-.promo-banner{
+/* .promo-banner{
 max-width: 1200px;
   margin: auto;
 }
@@ -276,7 +315,215 @@ max-width: 1200px;
 .btn-green:hover {
   background: #218838;
   transform: scale(1.05);
+} */
+
+
+
+
+
+/* .arrival_new{
+  background:black;
+  width:90%;
+  margin:auto;
+  padding:30px;
+} */
+/* ---- */
+ /* .arrival {
+  position: relative;
+  background: #edeaea;       
+  width: 90%;
+  margin: auto;
+  padding: 30px;
+  overflow: hidden;       
+} */
+.arrival {
+  width: 90%;
+  margin: auto;
+  padding: 30px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #ffe7d1, #ffd1dc);
+  animation: breatheColors 8s ease-in-out infinite;
+  background-size: 200% 200%;
 }
+
+@keyframes breatheColors {
+  0% {
+    background-position: 0% 50%;
+    filter: brightness(1);
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: brightness(1.15); /* subtle glow */
+  }
+  100% {
+    background-position: 0% 50%;
+    filter: brightness(1);
+  }
+}
+
+
+/* ===========================
+   Promo Carousel — Polished v1
+   (Drop-in for your promo-loop html)
+   =========================== */
+
+:root{
+  --promo-speed: 22s;   /* default, overridden by JS */
+  --promo-gap: 28px;
+  --card-radius: 12px;
+  --accent-grad: linear-gradient(90deg,#ffb84d,#ff7a59);
+}
+
+/* container */
+.promo-loop{
+  max-width:1200px;
+  margin:28px auto;
+  padding:16px;
+  border-radius:18px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.985), rgba(250,250,248,0.985));
+  box-shadow: 0 14px 48px rgba(10,14,24,0.06);
+  overflow:hidden;
+  border:1px solid rgba(18,22,30,0.04);
+  -webkit-backface-visibility:hidden;
+}
+
+/* viewport mask */
+.promo-viewport{
+  overflow:hidden;
+  border-radius:12px;
+  position:relative;
+}
+
+/* moving track */
+.promo-track{
+  display:flex;
+  gap:var(--promo-gap);
+  align-items:stretch;
+  padding:20px;
+  box-sizing: content-box;
+  transform: translateZ(0);
+  animation: promo_marquee var(--promo-speed) linear infinite;
+  will-change: transform;
+}
+
+/* pause on hover/focus */
+.promo-viewport:hover .promo-track,
+.promo-viewport:focus-within .promo-track {
+  animation-play-state: paused;
+}
+
+/* slide card */
+.promo-slide{
+  flex: 0 0 calc(25% - var(--promo-gap));
+  min-width: 260px;
+  display:flex;
+  gap:16px;
+  align-items:center;
+  background: linear-gradient(180deg,#ffffff,#fffaf6);
+  border-radius: var(--card-radius);
+  padding:14px;
+  box-shadow: 0 10px 30px rgba(12,16,24,0.06);
+  transition: transform .45s cubic-bezier(.2,.9,.25,1), box-shadow .35s ease;
+  border:1px solid rgba(16,22,34,0.04);
+  transform-origin:center center;
+  will-change: transform;
+}
+
+/* hover emphasis */
+.promo-slide:hover{
+  transform: translateY(-12px) rotateX(3deg) scale(1.02);
+  box-shadow: 0 36px 90px rgba(12,16,24,0.12);
+  z-index:6;
+}
+
+/* image column */
+.slide-img{
+  flex:0 0 46%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.slide-img img{
+  width:100%;
+  max-width:240px;
+  height:auto;
+  border-radius:10px;
+  transition: transform .8s cubic-bezier(.2,.9,.25,1), filter .45s ease;
+  will-change: transform, filter;
+  transform-origin:center center;
+}
+
+/* content column */
+.slide-content{ flex:1; padding-right:6px; }
+.slide-content h3{ font-size:20px; margin:0 0 6px; font-weight:800; color:#222; }
+.slide-content p{ font-size:14.5px; color:#444; margin:0 0 10px; line-height:1.45; }
+
+/* CTA */
+.btn-accent{
+  display:inline-block;
+  background:var(--accent-grad);
+  color:#111;
+  padding:8px 12px;
+  border-radius:8px;
+  text-decoration:none;
+  font-weight:700;
+  border:1px solid rgba(0,0,0,0.06);
+  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+.btn-accent:focus,
+.btn-accent:hover{ transform: translateY(-2px) scale(1.03); box-shadow: 0 12px 32px rgba(24,40,20,0.06); }
+
+/* micro-image hover animation */
+.promo-slide:hover .slide-img img{
+  transform: rotate(-6deg) scale(1.06) translateY(-6px);
+  filter: saturate(1.05);
+  animation: promo_img_micro 1000ms ease forwards;
+}
+@keyframes promo_img_micro {
+  0% { transform: rotate(0) scale(1) translateY(0); }
+  40% { transform: rotate(8deg) scale(1.08) translateY(-6px); }
+  100%{ transform: rotate(-6deg) scale(1.06) translateY(-6px); }
+}
+
+/* title shimmer on hover */
+.promo-slide:hover .slide-content h3{
+  animation: promo_title_shimmer 1.2s linear 0s 1;
+}
+@keyframes promo_title_shimmer {
+  0% { color:#222; text-shadow:none; transform:translateY(0); }
+  50%{ color:#b8860b; text-shadow:0 10px 30px rgba(184,134,11,0.12); transform:translateY(-4px); }
+  100%{ color:#222; transform:translateY(0); }
+}
+
+/* duplicated slides helper (if present) */
+.slide-dup { opacity:1; pointer-events:none; }
+
+/* marquee keyframe (moves left by half of track width -> requires duplicated block of slides) */
+@keyframes promo_marquee {
+  0%   { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+/* responsive adjustments */
+@media (max-width:992px){
+  .promo-slide{ flex:0 0 calc(50% - var(--promo-gap)); min-width:220px; }
+  .promo-track{ gap:20px; padding:16px; }
+}
+@media (max-width:640px){
+  .promo-slide{ flex:0 0 calc(90% - var(--promo-gap)); min-width:300px; flex-direction:column; gap:12px; }
+  .slide-img{ flex:0 0 auto; width:100%; }
+  .promo-track{ animation-duration: calc(var(--promo-speed) * 0.6); gap:12px; padding:12px; }
+}
+
+/* accessibility: reduce motion */
+@media (prefers-reduced-motion: reduce){
+  .promo-track{ animation: none !important; transform:none !important; }
+  .promo-slide, .slide-img img, .btn-accent{ transition:none !important; animation:none !important; }
+}
+
+/* safety: ensure track children don't hide background */
+.promo-loop, .promo-loop *{ background-clip: padding-box; -webkit-font-smoothing:antialiased; }
+
 
 /* ==== Trending Section ==== */
 .trending-now {
@@ -626,6 +873,41 @@ max-width: 1200px;
   max-width: 1200px;
   margin: auto;
 }
+/* .arrival_new{
+  background:black;
+  width:90%;
+  margin:auto;
+  padding:30px;
+} */
+ .arrival_new {
+  position: relative;
+  background: #949393;       /* black base */
+  width: 90%;
+  margin: auto;
+  padding: 30px;
+  overflow: hidden;       /* keep overlay inside */
+}
+
+.arrival_new::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.08),
+      rgba(255, 255, 255, 0.03)
+  );
+  opacity: 0.35;          /* adjust softness */
+  pointer-events: none;   /* don’t block clicks */
+  z-index: 0;
+}
+
+/* make the content stay above */
+.arrival_new * {
+  position: relative;
+  z-index: 2;
+}
+
 .faq-section {
   max-width: 800px;
   margin: 50px auto;
@@ -856,4 +1138,208 @@ max-width: 1200px;
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .toast { animation: none !important; transition: none !important; transform: none !important; }
+}
+
+
+/* =========================
+   EXTRA "WOW" ANIMATIONS
+   Append to end of home.css
+   ========================= */
+
+/* Subtle stagger helper for lists (applied via nth-child selectors below) */
+.animated-stagger { opacity: 0; transform: translateY(18px) scale(.995); animation: wow-entrance 700ms cubic-bezier(.16,.84,.28,1) both; }
+.animated-stagger:nth-child(1){ animation-delay: 0.06s; }
+.animated-stagger:nth-child(2){ animation-delay: 0.12s; }
+.animated-stagger:nth-child(3){ animation-delay: 0.18s; }
+.animated-stagger:nth-child(4){ animation-delay: 0.24s; }
+.animated-stagger:nth-child(5){ animation-delay: 0.30s; }
+
+/* Hero / Rent banner entrance & gentle float */
+@keyframes wow-entrance {
+  0% { opacity: 0; transform: translateY(28px) scale(.995); filter: blur(6px); }
+  60% { opacity: 1; transform: translateY(-6px) scale(1.01); filter: blur(0); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+.rent-banner { animation: wow-entrance 900ms ease both; }
+
+/* Floating slow sway for hero images to give life */
+@keyframes float-sway {
+  0% { transform: translateY(0) rotateZ(0deg); }
+  25% { transform: translateY(-6px) rotateZ(-1.2deg); }
+  50% { transform: translateY(0) rotateZ(0.6deg); }
+  75% { transform: translateY(6px) rotateZ(-0.7deg); }
+  100% { transform: translateY(0) rotateZ(0deg); }
+}
+.rent-images .img-front img,
+.rent-images .img-back img {
+  will-change: transform;
+  animation: float-sway 6.8s ease-in-out infinite;
+  transform-origin: 50% 50%;
+}
+
+/* Hero image subtle orbit (background behind foreground) */
+@keyframes orbit-slow {
+  0% { transform: translateY(0) translateX(0) rotate(0deg) scale(1); }
+  50% { transform: translateY(-8px) translateX(6px) rotate(1.2deg) scale(1.01); }
+  100% { transform: translateY(0) translateX(0) rotate(0deg) scale(1); }
+}
+.rent-images .img-back img { animation-duration: 9.6s; animation-name: orbit-slow, float-sway; }
+
+/* Promo hero "pop & spin" to draw attention */
+@keyframes pop-spin {
+  0% { transform: scale(.94) rotate(-2deg); opacity: 0; }
+  60% { transform: scale(1.06) rotate(2deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.promo-img img { transform-origin: center; animation: pop-spin 900ms cubic-bezier(.2,.9,.25,1) both; }
+
+/* Promo text letter bounce for headings */
+@keyframes title-bounce {
+  0% { transform: translateY(14px) skewY(0deg); opacity: 0; }
+  60% { transform: translateY(-6px) skewY(-2deg); opacity: 1; }
+  100% { transform: translateY(0) skewY(0deg); opacity: 1; }
+}
+.promo-text h3 { animation: title-bounce 900ms cubic-bezier(.18,.85,.32,1) both; }
+
+/* Button micro pulses and bounce */
+@keyframes btn-pulse {
+  0% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+  50% { transform: scale(1.03); box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
+  100% { transform: scale(1); box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+}
+.btn-green, .btn-yellow, .btn-rent {
+  will-change: transform, box-shadow;
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+.btn-green:hover, .btn-yellow:hover, .btn-rent:hover {
+  animation: btn-pulse 700ms ease forwards;
+}
+
+/* Product cards: 3D tilt on hover + energy wobble */
+@keyframes wobble-shine {
+  0% { transform: rotateX(0) rotateY(0) translateY(0); }
+  30% { transform: rotateX(1.2deg) rotateY(-1deg) translateY(-5px); }
+  60% { transform: rotateX(-.8deg) rotateY(.6deg) translateY(-2px); }
+  100% { transform: rotateX(0) rotateY(0) translateY(0); }
+}
+.product-card { transform-style: preserve-3d; perspective: 1200px; }
+.product-card:hover { animation: wobble-shine 720ms cubic-bezier(.16,.84,.28,1); }
+
+/* Category cards: layered shimmer + bounce on hover */
+@keyframes gold-shimmer {
+  0% { background-position: -200% 0; opacity: 0; }
+  40% { opacity: 0.18; }
+  100% { background-position: 200% 0; opacity: 0; }
+}
+.category-card::before {
+  background-image: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.18), rgba(255,255,255,0));
+  background-size: 300% 100%;
+}
+.category-card:hover::before { animation: gold-shimmer 1100ms linear forwards; }
+
+/* A playful bounce for category images when hovering */
+@keyframes img-bounce {
+  0% { transform: translateY(0) scale(1) rotateX(0); }
+  30% { transform: translateY(-10px) scale(1.08) rotateX(2deg); }
+  60% { transform: translateY(-4px) scale(1.04) rotateX(0.6deg); }
+  100% { transform: translateY(0) scale(1) rotateX(0); }
+}
+.category-card img { transition: transform 560ms cubic-bezier(.2,.9,.25,1); will-change: transform; }
+.category-card:hover img { animation: img-bounce 560ms ease forwards; }
+
+/* A subtle spinning gem accent on the first letter (title) */
+@keyframes spin-gem {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.04); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+.category-card h3::first-letter { display: inline-block; transform-origin: center; transition: transform .45s; }
+.category-card:hover h3::first-letter { animation: spin-gem 900ms ease; }
+
+/* Testimonials: gentle carousel card pop + flip-y micro */
+@keyframes testimonial-pop {
+  0% { transform: translateY(24px) scale(.98) rotateX(6deg); opacity: 0; filter: blur(6px); }
+  60% { transform: translateY(-6px) scale(1.02) rotateX(-2deg); opacity: 1; filter: blur(0); }
+  100% { transform: translateY(0) scale(1) rotateX(0); opacity: 1; filter: blur(0); }
+}
+.testimonial-card { animation: testimonial-pop 900ms cubic-bezier(.16,.84,.28,1) both; }
+
+/* Dot lively bounce */
+@keyframes dot-bounce {
+  0% { transform: translateY(0) scale(1); opacity: 0.9; }
+  50% { transform: translateY(-6px) scale(1.12); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 0.95; }
+}
+.dot { transition: transform .25s ease; }
+.dot.active { animation: dot-bounce 700ms ease; }
+
+/* Services: card zoom + light rotate */
+@keyframes service-zoom {
+  0% { transform: scale(.98) rotate(-1deg); opacity: 0; }
+  60% { transform: scale(1.02) rotate(.6deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.service-card { animation: service-zoom 850ms cubic-bezier(.16,.84,.28,1) both; }
+
+/* Toast: pop + subtle shake when shown to emphasize success */
+@keyframes toast-pop {
+  0% { transform: translateY(-10px) scale(.98); opacity: 0; }
+  60% { transform: translateY(6px) scale(1.03); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.toast.show { animation: toast-pop 420ms cubic-bezier(.2,.9,.25,1) forwards; }
+
+/* Toast success wiggle to draw micro-attention */
+@keyframes wiggle {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-4px); }
+  100% { transform: translateX(0); }
+}
+.toast.show.success-wiggle { animation: toast-pop 420ms ease, wiggle 520ms ease 380ms; }
+
+/* Tiny floating badges/accents - pseudo elements approach (non-invasive) */
+.rent-banner::after,
+.promo-banner::after {
+  content: "";
+  position: absolute;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  top: 8%;
+  right: 6%;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 30% 30%, rgba(255,200,80,0.14), rgba(255,120,80,0.04));
+  filter: blur(18px);
+  transform: translateZ(0);
+  animation: pulse-orb 2800ms ease-in-out infinite;
+}
+@keyframes pulse-orb {
+  0% { transform: scale(.9) translateY(0); opacity: .7; }
+  50% { transform: scale(1.06) translateY(-6px); opacity: .9; }
+  100% { transform: scale(.9) translateY(0); opacity: .7; }
+}
+
+/* Accessibility: Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .animated-stagger,
+  .rent-banner,
+  .rent-images .img-front img,
+  .rent-images .img-back img,
+  .promo-img img,
+  .promo-text h3,
+  .category-card:hover img,
+  .product-card,
+  .testimonial-card,
+  .dot.active,
+  .service-card,
+  .toast.show,
+  .category-card::before,
+  .rent-banner::after,
+  .promo-banner::after {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
 }
